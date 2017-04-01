@@ -51,7 +51,7 @@ done | xargs -L 1 -P 40 python
 ```
 
 
-## Filtering and merging the STRs
+## Filtering the STRs
 
 
 ```
