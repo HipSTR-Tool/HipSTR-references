@@ -52,3 +52,26 @@ done | xargs -L 1 -P 40 python
 
 
 ## Filtering and merging the STRs
+
+
+```
+files=""
+for chrom in $(seq 1 22) X Y
+do
+    files="$files,hg19/fixed_trf_results/chr$chrom.fa"
+done
+files=`echo $files | sed "s/,//"`
+python trf_parser.py $files > filtered_repeats.hg19.bed
+bedtools sort -i filtered_repeats.hg19.bed > filtered_repeats.hg19.sorted.bed
+```
+
+```
+files=""
+for chrom in $(seq 1 22) X Y
+do
+    files="$files,hg38/fixed_trf_results/chr$chrom.fa"
+done
+files=`echo $files | sed "s/,//"`
+python trf_parser.py $files > filtered_repeats.hg38.bed
+bedtools sort -i filtered_repeats.hg38.bed > filtered_repeats.hg38.sorted.bed
+```
