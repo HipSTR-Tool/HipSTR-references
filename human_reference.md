@@ -31,7 +31,7 @@ done
 cd ../../
 ```
 
-Next, we used [Tandem Repeats Finder](https://tandem.bu.edu/trf/trf.html) to identify repeats in each of these chromosomes.
+Next, we used [Tandem Repeats Finder (TRF)](https://tandem.bu.edu/trf/trf.html) to identify repeats in each of these chromosomes.
 We first downloaded an executable version of this program called **trf409.legacylinux64**. We then scanned each sequence using the **run_TRF.sh** script included in this repository as follows:
 ```
 for chrom in $(seq 1 22) X Y
@@ -41,6 +41,14 @@ do
 done | xargs -L 1 -P 30 ./run_TRF.sh
 ```
 
+As STRs are classically defined as having 1-6bp repeat motifs, we filtered the TRF output to only include these repeats. The script **fix_trf_output.py** performs this filtering and also corrects TRF entries in which the repeat size is incorrectly reported:
+```
+for chrom in $(seq 1 22) X Y
+do
+    echo fix_trf_output.py hg19/trf_results/chr$chrom.fa hg19/fixed_trf_results/chr$chrom.fa
+    echo fix_trf_output.py hg38/trf_results/chr$chrom.fa hg38/fixed_trf_results/chr$chrom.fa
+done | xargs -L 1 -P 40 python
+```
 
 
 ## Filtering and merging the STRs
