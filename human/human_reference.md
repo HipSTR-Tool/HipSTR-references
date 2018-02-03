@@ -3,9 +3,7 @@ This script describes how we built the HipSTR reference for the hg19 and hg38 ve
 
 It begins by using [Tandem Repeats Finder](https://tandem.bu.edu/trf/trf.html) to identify repeats on each chromosome and then
 extensively filters and processes the resulting repeats using standard unix utilities such as [grep](http://linuxcommand.org/man_pages/grep1.html) and [awk](http://linuxcommand.org/man_pages/awk1.html),
-as well as three command line utilities: [datamash](https://www.gnu.org/software/datamash/), [bedtools](http://bedtools.readthedocs.io/en/latest/) and [liftOver](https://genome.ucsc.edu/cgi-bin/hgLiftOve
-r). This script also requires an executable version of *Tandem Repeats Finder* called **trf409.legacylinux64**. Please download it from the TRF link above and ensure the other utilities are installed bef
-ore proceeding to follow the steps below
+as well as three command line utilities: [datamash](https://www.gnu.org/software/datamash/), [bedtools](http://bedtools.readthedocs.io/en/latest/) and [liftOver](https://genome.ucsc.edu/cgi-bin/hgLiftOver). This script also requires an executable version of *Tandem Repeats Finder* called **trf409.legacylinux64**. Please download it from the TRF link above and ensure the other utilities are installed before proceeding to follow the steps below
 
 ## Scanning the genome for STRs
 First, lest's download this github repository to obtain the required scripts:
@@ -65,7 +63,7 @@ done | xargs -L 1 -P 40 python
 ```
 
 ## Filtering the STRs
-
+We now filter out STRs with very low TRF scores, effectively keeping those repeats that are much more repetitive than one would expect by random chance. 
 ```
 files=""
 for chrom in $(seq 1 22) X Y
@@ -153,8 +151,8 @@ bedtools intersect -a pass.hg38.r4 -b human/all_annot_markers.hg38.fixed.bed -v 
 ```
 
 Perform various sanity checks on the results
- i.  Verify that all of hg19's entries are shared with GRCh38
- ii. Verify that the number of entries unique to GRCh38 matches the number of non-intersecting entries
+ 1.  Verify that all of hg19's entries are shared with GRCh38
+ 2. Verify that the number of entries unique to GRCh38 matches the number of non-intersecting entries
 ```
 nlines_a=`cat pass.hg19.r8.lifted_to_hg38 | wc -l`
 nlines_b=`cat pass.hg38.r5 | wc -l`
@@ -173,7 +171,7 @@ then
 fi
 ```
 
-Construct the final two references while ensuring that the numbering of STRs shared across references is consistent
+Construct the final two references while ensuring that the names of STRs shared across references is consistent
 
 hg19
 ```
@@ -190,7 +188,7 @@ cat human/all_annot_markers.hg38.fixed.bed | awk -v OFS="\t" '{print $1, $2, $3,
 bedtools sort -i hg38.hipstr_reference.bed > hg38.hipstr_reference.sorted.bed 
 ```
 
-Generate the final compressed references distributed for HipSTR
+Generate the final compressed human references for HipSTR
 ```
 cat hg19.hipstr_reference.sorted.bed                  | gzip -c >   hg19.hipstr_reference.bed.gz
 cat hg19.hipstr_reference.sorted.bed | sed "s/^chr//" | gzip -c > GRCh37.hipstr_reference.bed.gz
@@ -201,7 +199,8 @@ cat hg38.hipstr_reference.sorted.bed | sed "s/^chr//" | gzip -c > GRCh38.hipstr_
 Delete the temporary files created along the way
 ```
 rm -r hg19 hg38
-rm pass.hg19* pass.hg38* fail.hg19 fail.hg38 bad_markers.hg19.bed bad_markers.hg38.bed to_remove.bed unlifted
+rm pass.hg19* pass.hg38* fail.hg19 fail.hg38 bad_markers.hg19.bed bad_markers.hg38.bed to_remove.bed
 rm filtered_repeats.hg*
-rm hg19.hipstr_reference.bed hg38.hipstr_reference.bed hg19.hipstr_reference.sorted.bed hg38.hipstr_reference.sorted.bed
+rm hg19.hipstr_reference.bed hg38.hipstr_reference.bed unlifted
+rm hg19.hipstr_reference.sorted.bed hg38.hipstr_reference.sorted.bed
 ```
