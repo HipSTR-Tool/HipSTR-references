@@ -173,31 +173,31 @@ fi
 
 Construct the final two references while ensuring that the names of STRs shared across references is consistent
 
-hg19
 ```
+# hg19
 cat pass.hg19.r8 | awk -v OFS="\t" '{print $1, $2, $3, $4, ($3-$2+1)/$4, "Human_STR_"NR, $5}' > hg19.hipstr_reference.bed
 cat human/all_annot_markers.hg19.fixed.bed | awk -v OFS="\t" '{print $1, $2, $3, $4, ($3-$2+1)/$4, $6, "N/A"}' >> hg19.hipstr_reference.bed
 bedtools sort -i hg19.hipstr_reference.bed > hg19.hipstr_reference.sorted.bed 
 ```
 
-hg38
 ```
+# hg38
 cat pass.hg19.r8.lifted_to_hg38 | awk -v OFS="\t" '{print $1, $2, $3, $4, ($3-$2+1)/$4, "Human_STR_"NR, $5}' > hg38.hipstr_reference.bed
 bedtools intersect -a pass.hg38.r5 -b pass.hg19.r8.lifted_to_hg38 -v | awk -v OFFSET=$nshared -v OFS="\t" '{print $1, $2, $3, $4, ($3-$2+1)/$4, "Human_STR_"(NR+OFFSET), $5}' >> hg38.hipstr_reference.bed
 cat human/all_annot_markers.hg38.fixed.bed | awk -v OFS="\t" '{print $1, $2, $3, $4, ($3-$2+1)/$4, $6, "N/A"}' >> hg38.hipstr_reference.bed
 bedtools sort -i hg38.hipstr_reference.bed > hg38.hipstr_reference.sorted.bed 
 ```
 
-Generate the final compressed human references for HipSTR
 ```
+# Generate the final compressed human references for HipSTR
 cat hg19.hipstr_reference.sorted.bed                  | gzip -c >   hg19.hipstr_reference.bed.gz
 cat hg19.hipstr_reference.sorted.bed | sed "s/^chr//" | gzip -c > GRCh37.hipstr_reference.bed.gz
 cat hg38.hipstr_reference.sorted.bed                  | gzip -c >   hg38.hipstr_reference.bed.gz
 cat hg38.hipstr_reference.sorted.bed | sed "s/^chr//" | gzip -c > GRCh38.hipstr_reference.bed.gz
 ```
 
-Delete the temporary files created along the way
 ```
+# Delete the temporary files created along the way
 rm -r hg19 hg38
 rm pass.hg19* pass.hg38* fail.hg19 fail.hg38 bad_markers.hg19.bed bad_markers.hg38.bed to_remove.bed
 rm filtered_repeats.hg*
