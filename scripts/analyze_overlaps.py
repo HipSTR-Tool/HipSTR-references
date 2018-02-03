@@ -35,10 +35,11 @@ def main():
             if max_index != -1:
                 region = regions[max_index]
                 if cov_frac > 0.85:
-                    merge_pass.write("%s\t%s\t%d\t%d\t%.1f\n"%(region[0], region[1], region[2], region[3], region[4]))
+                    merge_pass.write("%s\t%s\t%d\t%d\t%.1f\t%s\n"%(region[0], region[1], region[2], region[3], region[4], region[6]))
                     pass_count += (len(regions) > 1)
                 elif len(set(list(map(lambda x: x[3], regions)))) == 1:
-                    merge_pass.write("%s\t%s\t%d\t%d\t%.1f\n"%(region[0], min_start, max_stop, region[3], 1.0*(max_stop-min_start+1)/int(region[3])))
+                    all_motifs   = [reg[6] for reg in regions]
+                    merge_pass.write("%s\t%s\t%d\t%d\t%.1f\t%s\n"%(region[0], min_start, max_stop, region[3], 1.0*(max_stop-min_start+1)/int(region[3]), "/".join(all_motifs)))
                 else:
                     for region in regions:
                         merge_fail.write("%s\t%s\t%d\t%d\t%.1f\t%d\t%s\t%s\n"%(region[0], region[1], region[2], region[3], region[4], region[5], region[6], region[7]))

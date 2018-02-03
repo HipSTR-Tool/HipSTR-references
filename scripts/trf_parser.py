@@ -9,6 +9,25 @@ start_index    = 0
 stop_index     = 1
 nrepeat_index  = 3
 
+def min_perm(seq):
+    min_perm = seq
+    for i in xrange(len(seq)):
+        other = seq[i:]+seq[0:i]
+        if other < min_perm:
+            min_perm = other
+    return min_perm
+
+def rev_complement(seq):
+    rev     = seq[::-1]
+    mapping = {"A":"T", "T":"A", "C":"G", "G":"C", "N":"N"}
+    res     = ""
+    for i in xrange(len(rev)):
+        res = res+mapping[rev[i]]
+    return res
+
+def canonical_motif(motif):
+    return min(min_perm(motif), min_perm(rev_complement(motif)))
+
 def create_filtered_trf_bed_file(input_files):
     max_period        = 6
     period_vals       = [1,  2,  3,  4,  5,  6]
@@ -31,7 +50,8 @@ def create_filtered_trf_bed_file(input_files):
                 filt_count += 1
                 continue
 
-            new_tokens = [chrom] + list(map(lambda x: tokens[x], [start_index, stop_index, period_index, motif_index, nrepeat_index, score_index, sequence_index]))
+            new_tokens    = [chrom] + list(map(lambda x: tokens[x], [start_index, stop_index, period_index, motif_index, nrepeat_index, score_index, sequence_index]))
+            new_tokens[4] = min_perm(new_tokens[4])
             print("\t".join(new_tokens))
             keep_count += 1
 
